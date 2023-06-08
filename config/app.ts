@@ -1,5 +1,5 @@
 const userName = "Maximilian";
-userName = 3; //에러
+// userName = 3; //에러
 
 console.log(userName);
 
