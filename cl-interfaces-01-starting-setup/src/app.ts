@@ -1,4 +1,5 @@
 class Department {
+  static fiscalYear = "2020";
   // private readonly id: string;
   // public name: string;
   protected employees: string[] = []; // private은 해당 클래스에서만 이 속성을 사용할 수 있게 하지만, protected는 외부에서는 접근할 수 없지만, 해당 클래스를 확장한 클래스에서는 이 속성에 접근할 수 있게 함!
@@ -8,6 +9,15 @@ class Department {
   constructor(private readonly id: string, public name: string) {
     // this.id = id;
     // this.name = n;
+    // 정적 속성과 정적 메서드는 인스턴스에서 유효하지 않음. 인스턴스와 분리되어 있음.
+    // static이라고 정의되어 있는 부분에서만 접근할 수 있음(constructor는 static으로 바꿀 수 없기 때문에 접근할 수 없음. static 속성은 this로 접근할 수 없다)
+    // 그렇기 때문에 클래스 내부에서 static 속성/메서드에 접근하려면 클래스 이름으로 접근해야 함!
+    // console.log(this.fiscalYear); // 이 부분은 에러가 발생함
+    // console.log(Department.fiscalYear); // 이렇게 접근해야 함
+  }
+
+  static createEmployee(name: string) {
+    return { name: name };
   }
 
   // 아래처럼 메소드에 매개변수를 지정하고, 타입을 지정하면 undefined가 나오는(원치 않는 결과가 나오는) 것을 방지 할 수 있음
@@ -78,6 +88,10 @@ class AccountingDepartment extends Department {
     console.log(this.reports);
   }
 }
+
+// 새 키워드를 입력하지 않고 직접 메서드를 사용할 수 있음. 우리가 흔히 사용하는 Math가 대표적인 예. new Math를 하지 않고 Math.pow..등으로 사용함
+const employee1 = Department.createEmployee("Max");
+console.log(employee1, Department.fiscalYear); // 메서드가 아닌 속성도 static으로 정의할 수 있음
 
 const it = new ITDepartment("d1", ["Max"]);
 // console.log(accounting);
