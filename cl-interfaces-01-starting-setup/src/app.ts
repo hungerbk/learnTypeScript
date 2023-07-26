@@ -1,5 +1,6 @@
 class Department {
-  name: string;
+  public name: string;
+  private employees: string[] = [];
 
   constructor(n: string) {
     this.name = n;
@@ -10,15 +11,31 @@ class Department {
   describe(this: Department) {
     console.log("Department: " + this.name);
   }
+
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
+
+  printEmployeeInformation() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+  }
 }
 
 const accounting = new Department("Accounting");
 // console.log(accounting);
 accounting.describe();
 
-const accountingCopy = { name: "DUMMY", describe: accounting.describe };
+accounting.addEmployee("Max");
+accounting.addEmployee("Manu");
 
-accountingCopy.describe();
+accounting.employees[2] = "Anna";
+
+accounting.printEmployeeInformation();
+
+// const accountingCopy = { name: "DUMMY", describe: accounting.describe };
+
+// accountingCopy.describe();
 // this는 자기를 호출한 객체를 가리킴.
 // 여기에서 this는 accountingCopy인데, 이 객체는 name이 없음. 그렇기 때문에 undefined가 출력됨
 
