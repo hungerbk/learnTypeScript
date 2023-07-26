@@ -34,8 +34,31 @@ class ITDepartment extends Department {
 }
 
 class AccountingDepartment extends Department {
+  // private은 외부에서 . 으로 접근할 수 없음 > 이걸 가능하게 하는 것이 getter
+  private lastReport: string;
+
+  // 캡슐화한 속성을 읽고/쓰기 위해서 사용하는 것이 getter와 setter. 다양한 로직을 사용할 수 있음
+
+  // getter 작성할 때는 메서드 처럼 (){} 필요
+  get mostRecentReport() {
+    if (this.lastReport) {
+      return this.lastReport; // getter는 반드시 무언가를 반환해야 함!
+    }
+
+    throw new Error("no report found.");
+  }
+
+  // 값을 설정해야 하기 때문에 인수를 전달해야 함
+  set mostRecentReport(value: string) {
+    if (!value) {
+      throw new Error("Please pass in a valid value!");
+    }
+    this.addReport(value); // 클래스 내부의 메서드에 접근할 수 있음
+  }
+
   constructor(id: string, public reports: string[]) {
     super(id, "Accounting");
+    this.lastReport = reports[0];
   }
 
   // 부모클래스에 정의된 메서드를 재정의할 수 있다
@@ -48,6 +71,7 @@ class AccountingDepartment extends Department {
 
   addReport(text: string) {
     this.reports.push(text);
+    this.lastReport = text;
   }
 
   printReport() {
@@ -69,7 +93,11 @@ it.printEmployeeInformation();
 console.log(it);
 
 const accounting = new AccountingDepartment("d2", []);
+
+// accounting.mostRecentReport = ""; //setter도 getter처럼 속성으로 접근해야 함. 등호를 사용하여 값을 할당. 이렇게 하면 빈 문자열을 유효한 값이 아니기 때문에 에러 발생
+accounting.mostRecentReport = "Year End Report"; // 이 값이 reports에 추가 됨
 accounting.addReport("Something went wrong...");
+console.log(accounting.mostRecentReport); //실행할 때는 속성으로 접근. ()를 입력하지 않음
 
 accounting.addEmployee("Max");
 accounting.addEmployee("Manu");
