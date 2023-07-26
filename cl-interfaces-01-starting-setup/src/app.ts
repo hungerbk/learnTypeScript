@@ -1,7 +1,7 @@
 class Department {
   // private readonly id: string;
   // public name: string;
-  private employees: string[] = [];
+  protected employees: string[] = []; // private은 해당 클래스에서만 이 속성을 사용할 수 있게 하지만, protected는 외부에서는 접근할 수 없지만, 해당 클래스를 확장한 클래스에서는 이 속성에 접근할 수 있게 함!
   // readonly는 속성이 초기화된 이후 값이 변경되어서는 안 된다는 것을 의미. 코드에 안전성과 명확성을 더해줌.
   // 이중 초기화를 한번에하는 것 원래는 주석처리한 부분(2, 3번 줄 + 9, 10번 줄) 모두 작성해야 하는데, 컨스트럭터 괄호 안의 한 줄로 끝낼 수 있음
   // 값을 찾은 다음에 인수를 할당해야 하는데, 저렇게 하면 같은 이름의 속성이 생성되고 인수에 대한 값이 속성이 저장되는 것
@@ -38,6 +38,14 @@ class AccountingDepartment extends Department {
     super(id, "Accounting");
   }
 
+  // 부모클래스에 정의된 메서드를 재정의할 수 있다
+  addEmployee(name: string) {
+    if (name === "Max") {
+      return;
+    }
+    this.employees.push(name);
+  }
+
   addReport(text: string) {
     this.reports.push(text);
   }
@@ -62,7 +70,12 @@ console.log(it);
 
 const accounting = new AccountingDepartment("d2", []);
 accounting.addReport("Something went wrong...");
+
+accounting.addEmployee("Max");
+accounting.addEmployee("Manu");
+
 accounting.printReport();
+accounting.printEmployeeInformation();
 
 // const accountingCopy = { name: "DUMMY", describe: accounting.describe };
 
