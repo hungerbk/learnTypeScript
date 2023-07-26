@@ -1,4 +1,8 @@
-class Department {
+abstract class Department {
+  // abstract으로 정의된 메서드가 하나라도 있으면 해당 클래스도 abstract이 되어야 함
+  // 추상 클래스는 일부 상위 클래스를 기반으로 하는 모든 클래스가 일부 공통 메서드 혹은 공통 속성을 공유하도록 하려는 경우 유용함
+  // Department를 확장한 ITDepartment와 AccountingDepartment 모두 describe()를 가지고 있어야 함. 기능은 달라도 괜찮음
+
   static fiscalYear = "2020";
   // private readonly id: string;
   // public name: string;
@@ -6,7 +10,7 @@ class Department {
   // readonly는 속성이 초기화된 이후 값이 변경되어서는 안 된다는 것을 의미. 코드에 안전성과 명확성을 더해줌.
   // 이중 초기화를 한번에하는 것 원래는 주석처리한 부분(2, 3번 줄 + 9, 10번 줄) 모두 작성해야 하는데, 컨스트럭터 괄호 안의 한 줄로 끝낼 수 있음
   // 값을 찾은 다음에 인수를 할당해야 하는데, 저렇게 하면 같은 이름의 속성이 생성되고 인수에 대한 값이 속성이 저장되는 것
-  constructor(private readonly id: string, public name: string) {
+  constructor(protected readonly id: string, public name: string) {
     // this.id = id;
     // this.name = n;
     // 정적 속성과 정적 메서드는 인스턴스에서 유효하지 않음. 인스턴스와 분리되어 있음.
@@ -22,9 +26,8 @@ class Department {
 
   // 아래처럼 메소드에 매개변수를 지정하고, 타입을 지정하면 undefined가 나오는(원치 않는 결과가 나오는) 것을 방지 할 수 있음
   // this.name이 없는 경우 에러가 발생함
-  describe(this: Department) {
-    console.log(`Department (${this.id}): ${this.name}`);
-  }
+  abstract describe(this: Department): void;
+  // abstract으로 지정하면 타입을 지정하는 것 외에 다른 것은 할 수 없음. (중괄호를 이용하여 다른 기능을 구현할 수 없음)
 
   addEmployee(employee: string) {
     this.employees.push(employee);
@@ -40,6 +43,11 @@ class Department {
 class ITDepartment extends Department {
   constructor(id: string, public admins: string[]) {
     super(id, "IT"); // 부모 클래스에 속성 전달. this를 사용하는 것보다 먼저 나와야 작업이 가능함
+  }
+
+  // Department를 확장한 ITDepartment와 AccountingDepartment 모두 describe()를 가지고 있어야 함. 기능은 달라도 괜찮음
+  describe() {
+    console.log("IT Department ID - " + this.id);
   }
 }
 
@@ -86,6 +94,11 @@ class AccountingDepartment extends Department {
 
   printReport() {
     console.log(this.reports);
+  }
+
+  // Department를 확장한 ITDepartment와 AccountingDepartment 모두 describe()를 가지고 있어야 함. 기능은 달라도 괜찮음
+  describe() {
+    console.log("Accounting Department ID - " + this.id);
   }
 }
 
