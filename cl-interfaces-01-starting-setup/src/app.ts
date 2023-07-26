@@ -26,16 +26,43 @@ class Department {
   }
 }
 
-const accounting = new Department("d1", "Accounting");
-// console.log(accounting);
-accounting.describe();
+// 상속 Department의 속성을 그대로 사용 + 새로운 속성을 추가할 때 사용. 상속은 하나만 받을 수 있다.
+class ITDepartment extends Department {
+  constructor(id: string, public admins: string[]) {
+    super(id, "IT"); // 부모 클래스에 속성 전달. this를 사용하는 것보다 먼저 나와야 작업이 가능함
+  }
+}
 
-accounting.addEmployee("Max");
-accounting.addEmployee("Manu");
+class AccountingDepartment extends Department {
+  constructor(id: string, public reports: string[]) {
+    super(id, "Accounting");
+  }
+
+  addReport(text: string) {
+    this.reports.push(text);
+  }
+
+  printReport() {
+    console.log(this.reports);
+  }
+}
+
+const it = new ITDepartment("d1", ["Max"]);
+// console.log(accounting);
+it.describe();
+
+it.addEmployee("Max");
+it.addEmployee("Manu");
 
 // accounting.employees[2] = "Anna";
 
-accounting.printEmployeeInformation();
+it.printEmployeeInformation();
+
+console.log(it);
+
+const accounting = new AccountingDepartment("d2", []);
+accounting.addReport("Something went wrong...");
+accounting.printReport();
 
 // const accountingCopy = { name: "DUMMY", describe: accounting.describe };
 
