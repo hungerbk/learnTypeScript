@@ -54,6 +54,7 @@ class ITDepartment extends Department {
 class AccountingDepartment extends Department {
   // private은 외부에서 . 으로 접근할 수 없음 > 이걸 가능하게 하는 것이 getter
   private lastReport: string;
+  private static instance: AccountingDepartment;
 
   // 캡슐화한 속성을 읽고/쓰기 위해서 사용하는 것이 getter와 setter. 다양한 로직을 사용할 수 있음
 
@@ -74,9 +75,19 @@ class AccountingDepartment extends Department {
     this.addReport(value); // 클래스 내부의 메서드에 접근할 수 있음
   }
 
-  constructor(id: string, public reports: string[]) {
+  // 이렇게 하면 싱글톤 패턴이 됨 > 하나의 인스턴스만 만들겠다는 것임 > new 생성자를 통해 만들 수 없음
+  private constructor(id: string, public reports: string[]) {
     super(id, "Accounting");
     this.lastReport = reports[0];
+  }
+
+  // 아래와 같은 static 을 통해 인스턴스를 만들어야 함
+  static getInstance() {
+    if (AccountingDepartment.instance) {
+      return this.instance; //있으면 있는 것을 반환
+    }
+    this.instance = new AccountingDepartment("d2", []); // 없으면 새로 생성하여 반환
+    return this.instance;
   }
 
   // 부모클래스에 정의된 메서드를 재정의할 수 있다
@@ -119,7 +130,11 @@ it.printEmployeeInformation();
 
 console.log(it);
 
-const accounting = new AccountingDepartment("d2", []);
+// const accounting = new AccountingDepartment("d2", []); // private constructor를 설정하면 이제 이렇게 만들 수 없음
+const accounting = AccountingDepartment.getInstance(); // 이렇게 만들어야 함. getInstance()가 실행되면 있으면 그것을 반환, 없으면 새로 만듦
+const accounting2 = AccountingDepartment.getInstance();
+
+console.log(accounting, accounting2); // 이 둘은 같은 객체임!
 
 // accounting.mostRecentReport = ""; //setter도 getter처럼 속성으로 접근해야 함. 등호를 사용하여 값을 할당. 이렇게 하면 빈 문자열을 유효한 값이 아니기 때문에 에러 발생
 accounting.mostRecentReport = "Year End Report"; // 이 값이 reports에 추가 됨
