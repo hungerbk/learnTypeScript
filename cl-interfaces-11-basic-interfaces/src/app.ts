@@ -1,7 +1,8 @@
 interface Greetable {
   // 인터페이스는 객체의 구조를 정의/설명하는 것
   // 초깃값을 가질 수 없음
-  name: string;
+  readonly name: string;
+  // 인터페이스에는 퍼블릭, 프라이빗은 설정할 수 없고 readonly만 설정할 수 있다
 
   greet(phrase: string): void;
 }
@@ -31,6 +32,7 @@ let user1: Greetable; // 인터페이스를 타입으로 사용할 수 있음
 // };
 
 user1 = new Person("Max");
+// user1.name = 'Manu' // 에러. 인터페이스에 name을 리드온리로 설정했기 때문에 클래스에 따로 설정을 하지 않아도 인터페이스의 속성이 적용됨. name은 변경불가능한 값이다
 
 user1.greet("Hi there - I am");
 console.log(user1);
