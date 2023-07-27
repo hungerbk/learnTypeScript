@@ -1,7 +1,13 @@
-interface Greetable {
+interface Named {
+  readonly name: string;
+}
+// 인터페이스는 여러개의 인터페이스를 상속받을 수 있음(클래스와 차이점!!! 클래스는 하나의 클래스만 상속받을 수 있음!). 다 병합되는 것이기 때문
+// Greetable에는 name이 없어도 되지만
+// Person에는 name이 없으면 에러가 발생함
+interface Greetable extends Named {
   // 인터페이스는 객체의 구조를 정의/설명하는 것
   // 초깃값을 가질 수 없음
-  readonly name: string;
+
   // 인터페이스에는 퍼블릭, 프라이빗은 설정할 수 없고 readonly만 설정할 수 있다
 
   greet(phrase: string): void;
