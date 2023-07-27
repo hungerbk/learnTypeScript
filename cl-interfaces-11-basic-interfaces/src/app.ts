@@ -1,3 +1,15 @@
+// type AddFn = (a:number, b:number) => number;
+interface AddFn {
+  // 인터페이스에 익명함수로 작성하면 사용자 정의 함수 타입을 사용하는 것과 같음
+  (a: number, b: number): number;
+}
+
+let add: AddFn;
+
+add = (n1: number, n2: number) => {
+  return n1 + n2;
+};
+
 interface Named {
   readonly name: string;
 }
