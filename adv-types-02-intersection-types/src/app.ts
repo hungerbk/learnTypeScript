@@ -62,13 +62,20 @@ result.split(" ");
 const fetchedUserData = {
   id: "u1",
   name: "Max",
-  // job: { title: "CEO", description: "my own company" },
+  job: { title: "CEO", description: "my own company" },
 };
 
 // 아래가 자스에서 하는 방법. 유효성 검사를 해서 있는 경우에만 실행하여 런타임 에러를 방지
 // console.log(fetchedUserData.job && fetchedUserData.job.title);
 // 아래가 옵셔널 체이닝
 console.log(fetchedUserData?.job?.title);
+
+// null 병합 연산자
+// 값이 null 이거나 undefined인 경우에만 뒤의 값이 출력되도록 함
+// 빈 문자열이나 0 이어도 값이 있는 것으로 판단함 ( || 연산자와는 다름)
+const userInput = null;
+const storedData = userInput ?? "DEFAULT";
+console.log(storedData);
 
 // 타입가드
 // 특정 속성이나 메서드를 사용하기 전에 그것이 존재하는지 확인하는 작업
