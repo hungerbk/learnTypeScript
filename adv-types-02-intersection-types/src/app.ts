@@ -32,6 +32,17 @@ type Numeric = number | boolean;
 
 type Universal = Combinable & Numeric;
 
+// 함수 오버로드
+// 함수 위에 다음과 같이 적어주면 됨
+// 이 부분이 없는 경우에는 add 함수는 Combinable을 반환하기 때문에 문자열을 입력하더라도 split를 사용할 수 없음
+// 아래 처럼 정의하면 문자열이 있는 경우에는 문자열을 반환하기 때문에 문자열의 함수들을 사용할 수 있게 됨
+// 개별적으로 하나의 매개변수만도 설정할 수 있음(다른 변수는 옵셔널로 설정해야 함)
+// 타스가 자체적으로 어떤 타입을 반환하는지 모르는 경우 유용함
+// 함수에서 지원할 수 있는 다양한 조합에 대해 어떤 것이 반환되는지 명확하게 알 수 있음
+function add(a: string, b: string): string;
+function add(a: number, b: number): number;
+function add(a: number, b: string): string;
+function add(a: string, b: number): string;
 function add(a: Combinable, b: Combinable) {
   // 아래 if문이 타입 가드
   // 유니언 타입이 지닌 유연성을 활용할 수 있게 하고 런타임 시 코드가 정확하게 작동할 수 있게 함
@@ -40,6 +51,9 @@ function add(a: Combinable, b: Combinable) {
   }
   return a + b;
 }
+
+const result = add("Max", " Schwarz");
+result.split(" ");
 
 // 타입가드
 // 특정 속성이나 메서드를 사용하기 전에 그것이 존재하는지 확인하는 작업
