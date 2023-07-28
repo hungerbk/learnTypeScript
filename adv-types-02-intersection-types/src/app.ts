@@ -132,3 +132,20 @@ function moveAnimal(animal: Animal) {
 }
 
 moveAnimal({ type: "bird", flyingSpeed: 10 });
+
+// 형변환
+
+// 아래 두 코드는 같은 방식임
+// 첫번째 방식이 리액트의 jsx와 혼동될 수 있기 때문에 as를 사용하는 방법도 있음
+// const userInputElement = <HTMLInputElement>document.getElementById("user-input")!;
+// const userInputElement = document.getElementById("user-input")! as HTMLInputElement;
+
+// 느낌표는 null값이 오지 않는다는 것을 확신하는 경우에만 쓸 수 있음
+// 확신할 수 없는 경우에는 if문을 사용해야 함
+// 느낌표를 사용하지 않는 경우 형변환은 아래와 같이 사용해야 함
+
+const userInputElement = document.getElementById("user-input");
+
+if (userInputElement) {
+  (userInputElement as HTMLInputElement).value = "Hi there!";
+}
