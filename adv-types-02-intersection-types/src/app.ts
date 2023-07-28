@@ -98,3 +98,37 @@ function useVehicle(vehicle: Vehicle) {
 
 useVehicle(v1);
 useVehicle(v2);
+
+// 구별된 유니언
+// 객체가 공통 속성이 있는 경우 이를 가지고 switch문을 통해 구분하여 필요한 속성을 사용함
+// 실제 존재하는 속성을 사용하여 어떤 유형의 객체와 작업하고 있는지 확인할 수 있음
+// 어떤 값만 사용할 수 있는지 타스가 알고 있기 때문에 오타 발생 가능성이 적음 > 사용할 수 없는 값은 에러로 표시
+
+interface Bird {
+  // 리터럴 타입
+  type: "bird";
+  flyingSpeed: number;
+}
+
+interface Horse {
+  type: "horse";
+  runningSpeed: number;
+}
+
+type Animal = Bird | Horse;
+
+function moveAnimal(animal: Animal) {
+  let speed;
+  switch (animal.type) {
+    case "bird":
+      speed = animal.flyingSpeed;
+      break;
+    case "horse":
+      speed = animal.runningSpeed;
+      break;
+  }
+
+  console.log("Moving at speed: " + speed);
+}
+
+moveAnimal({ type: "bird", flyingSpeed: 10 });
