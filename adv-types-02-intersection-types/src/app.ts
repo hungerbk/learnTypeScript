@@ -149,3 +149,19 @@ const userInputElement = document.getElementById("user-input");
 if (userInputElement) {
   (userInputElement as HTMLInputElement).value = "Hi there!";
 }
+
+// 인덱스 속성
+// 속성의 이름과 개수를 미리 알지 않아도 괜찮음
+// 좀더 유연하게 작성할 수 있다
+
+interface ErrorContainer {
+  // {email: 'Not a valid email!', username: 'Must start with a capital character!'}
+  [prop: string]: string; // 속성의 이름도 값도 string이어야 함을 정의
+  // 이렇게 해도 속성 이름에는 숫자를 입력할 수 있다. 문자열로 변환될 수 있는 값이면 사용할 수 있기 때문에!
+  // 하지만 여기에 number를 설정하면 문자열을 이름으로 사용할 수 없기 때문에 주의하자
+}
+
+const errorBag: ErrorContainer = {
+  email: "Not a valid email!",
+  username: "Must start with a capital character!",
+};
