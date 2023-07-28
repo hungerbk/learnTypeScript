@@ -55,6 +55,21 @@ function add(a: Combinable, b: Combinable) {
 const result = add("Max", " Schwarz");
 result.split(" ");
 
+// 옵셔널 체이닝
+// 객체 데이터의 중첩된 속성과 객체에 안전하게 접근할 수 있게 한다
+// 데이터를 백엔드에서 받아올 때 어떤 값이 정확히 있는지 없는지 알 수 없을 때 사용
+
+const fetchedUserData = {
+  id: "u1",
+  name: "Max",
+  // job: { title: "CEO", description: "my own company" },
+};
+
+// 아래가 자스에서 하는 방법. 유효성 검사를 해서 있는 경우에만 실행하여 런타임 에러를 방지
+// console.log(fetchedUserData.job && fetchedUserData.job.title);
+// 아래가 옵셔널 체이닝
+console.log(fetchedUserData?.job?.title);
+
 // 타입가드
 // 특정 속성이나 메서드를 사용하기 전에 그것이 존재하는지 확인하는 작업
 // 객체의 경우 instanceof, in 을 사용할 수 있고 다른 경우 typeof를 사용하면 됨
