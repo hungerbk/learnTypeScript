@@ -91,4 +91,51 @@ function extractAndconvert<T extends object, U extends keyof T>(obj: T, key: U) 
   return "Value " + obj[key];
 }
 extractAndconvert({ name: "Max" }, "name");
-extractAndconvert({ name: "Max" }, "age"); //에러
+// extractAndconvert({ name: "Max" }, "age"); //에러
+
+// 제네릭 클래스
+// 사용방식을 미세하게 조절하는 것보다(객체 사용 등..) 원시값만 사용할 수 있도록 지정하는 것이 더 낫다
+class DataStorage<T extends string | number | boolean> {
+  private data: T[] = [];
+
+  addItem(item: T) {
+    this.data.push(item);
+  }
+
+  // 클래스 안에 있는 메소드에도 다른 제네럴 타입을 지정해서 쓸 수도 있다!
+  removeItem(item: T) {
+    // 이를 해결하기 위해서 if문 이용
+    if (this.data.indexOf(item) === -1) {
+      return; // 없으면 그냥 반환
+    }
+    this.data.splice(this.data.indexOf(item), 1);
+    // 객체인 경우, 주소를 찾지만 주소가 없음.. 그래서 마지막 요소를 지우게 됨
+  }
+
+  getItems() {
+    return [...this.data];
+  }
+}
+
+const textStorage = new DataStorage<string>();
+// textStorage.addItem(10); //에러
+textStorage.addItem("Max");
+textStorage.addItem("Manu");
+textStorage.removeItem("Max");
+console.log(textStorage.getItems());
+
+const numberStorage = new DataStorage<number>();
+
+// 해당 클래스가 원시값에만 작동하도록 수정했기 때문에 아래는 쓸 수 없음!
+
+// const objStorage = new DataStorage<object>();
+
+// objStorage.addItem({ name: "Max" });
+// objStorage.addItem({ name: "Manu" });
+// objStorage.removeItem({ name: "Max" });
+// console.log(objStorage.getItems()); //원하는 대로 작동하지 않음. 객체는 원시타입이 아니라 참조타입이기 때문..!! indexOf를 통해 아이템을 제거하는 데, 이는 참조타입에는 맞지 않는 방식임
+
+// //객체에서 사용할 수 있는 방법은 같은 객체를 추가하고 제거하는 것뿐
+// const maxObj = { name: "Max" };
+// objStorage.addItem(maxObj);
+// objStorage.removeItem(maxObj);
