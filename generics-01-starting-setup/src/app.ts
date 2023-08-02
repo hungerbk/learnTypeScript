@@ -84,3 +84,11 @@ console.log(countAndDescribe("Hi there!")); //['Hi there!', 'Got 9 elements.']
 console.log(countAndDescribe(["sports", "cooking"])); //[Array(2), 'Got 2 elements.']
 console.log(countAndDescribe([])); //[Array(0), 'Got no value.']
 // console.log(countAndDescribe(10)); // 에러. number는 length 속성이 없음
+
+// keyof 부분이 없는 경우, 객체에 해당 키가 있는지 알 수 없기 때문에 에러가 발생함
+// 존재하지 않는 속성에 접근하려는 것을 방지 할 수 있음
+function extractAndconvert<T extends object, U extends keyof T>(obj: T, key: U) {
+  return "Value " + obj[key];
+}
+extractAndconvert({ name: "Max" }, "name");
+extractAndconvert({ name: "Max" }, "age"); //에러
