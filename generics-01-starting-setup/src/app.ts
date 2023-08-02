@@ -62,3 +62,25 @@ console.log(mergedObj.name);
 // 그냥 <{}, {}> 이런식으로 하면 에러 발생
 // 하지만 굳이 아래처럼 할 필요는 없다!
 // const mergedObj2 = merge<{ name: string; hobbies: string[] }, { age: number }>({ name: "Max", hobbies: ["Cooking}"] }, { age: 30 });
+
+// 새로운 타입 지정
+interface Lengthy {
+  length: number;
+}
+
+// 우리가 받는 매개변수가 어떤 값이든 length 속성이 있는 것만 올 수 있음. string, array 상관 없이
+// 올 수 있는 값을 유연하게 설정할 수 있음. 어떤 타입이든 length 속성이 있는 타입이 오도록 설정하는 것
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let descriptionText = "Got no value.";
+  if (element.length === 1) {
+    descriptionText = "Got 1 element.";
+  } else if (element.length > 1) {
+    descriptionText = "Got " + element.length + " elements.";
+  }
+  return [element, descriptionText];
+}
+
+console.log(countAndDescribe("Hi there!")); //['Hi there!', 'Got 9 elements.']
+console.log(countAndDescribe(["sports", "cooking"])); //[Array(2), 'Got 2 elements.']
+console.log(countAndDescribe([])); //[Array(0), 'Got no value.']
+// console.log(countAndDescribe(10)); // 에러. number는 length 속성이 없음
