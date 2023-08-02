@@ -42,8 +42,18 @@
 // 무작위가 아닌 다양한 타입 데이터를 얻는 것이라고 알려주는 것
 // 정확한 객체나 타입을 알 필요가 없음.
 // 특정 객체가 아닌 인터섹션을 반환한다는 것만 알려주면 됨
-function merge<T, U>(objA: T, objB: U) {
-  return Object.assign(objA, objB); // 여기 왜 에러가 발생할까..
+
+// 제네릭 타입의 제약조건
+// Object.assign()은 서로 다른 객체만 반환함 > 그래서 에러가 발생했던 듯
+// 제네릭 타입에 extends를 사용하여 제약 조건을 설정할 수 있다
+// 어떤 값이든 올 수 있지만 객체라는 것을 의미
+// 어떤 타입이든 쓸 수 있다. 객체, 유니언 타입, 사용자 지정 타입 등등..
+// 아래 처럼 작성하면 에러가 발생하지 않음
+// 하나의 변수에만 할당할 수도 있는데, 아래의 예시에서는 둘다 객체여야 하기 때문에 둘다 작성하는 것이 일반적이다
+// 이렇게 작성하면 객체가 아닌 경우에는 에러가 발생한다
+
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  return Object.assign(objA, objB);
 }
 // 위 처럼 작성하면 타스가 알아서 타입을 추론함
 const mergedObj = merge({ name: "Max" }, { age: 30 });
@@ -51,4 +61,4 @@ console.log(mergedObj.name);
 // 물론 아래처럼 세부적으로 알려줄 수 있음
 // 그냥 <{}, {}> 이런식으로 하면 에러 발생
 // 하지만 굳이 아래처럼 할 필요는 없다!
-const mergedObj2 = merge<{ name: string; hobbies: string[] }, { age: number }>({ name: "Max", hobbies: ["Cooking}"] }, { age: 30 });
+// const mergedObj2 = merge<{ name: string; hobbies: string[] }, { age: number }>({ name: "Max", hobbies: ["Cooking}"] }, { age: 30 });
