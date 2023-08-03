@@ -95,6 +95,39 @@ extractAndconvert({ name: "Max" }, "name");
 
 // 제네릭 클래스
 // 사용방식을 미세하게 조절하는 것보다(객체 사용 등..) 원시값만 사용할 수 있도록 지정하는 것이 더 낫다
+
+// 제네릭 타입 vs 유니언 타입
+
+// DataStoarage 클래스를 유니언 타입으로 쓴다면 아래처럼 쓸 수 있음
+// class DataStorage {
+//   private data: (string | number | boolean)[] = [];
+
+//   addItem(item: string | number | boolean) {
+//     this.data.push(item);
+//   }
+// 하지만 이는 완전히 다르게 작동함!!!!
+// 이는 배열에 문자열이든 숫자든 불리안이든 모든 값을 넣겠다는 것을 의미함!!
+// 문자열의 배열, 숫자의 배열, 불리안의 배열이 아니라 모든 것이 혼합된 배열을 의미함!!!
+
+// 그래서 윗 부분을 아래처럼 바꾼다면 또다른 에러가 발생함
+
+// class DataStorage {
+//   private data: string[] | number[] | boolean[] = [];
+
+//   addItem(item: string | number | boolean) {
+//     this.data.push(item); //여기에서 에러 발생
+//   }
+// 어떤 타입의 배열이 올지 모르는데, 불리안 배열에는 문자열이나 숫자를 추가할 수 없기 때문에 발생하는 에러임
+
+// 제네릭 타입의 경우 하나의 데이터를 선택해서
+// 그 타입만 추가할 수 있게 설정하는 것임!
+
+// 유니언 타입의 경우, 함수를 호출할 때 마다 이 타입들 중 하나로 호출해야 할 때 사용
+// 모든 메소드 호출이나 함수 호출마다 다른 타입을 지정하고자 하는 경우에 사용
+
+// 제네릭 타입의 경우, 특정 타입으로 고정하거나
+// 우리가 생성한 전체 클래스 인스턴스에 걸쳐 같은 함수를 사용하거나 전체 함수에 걸쳐 같은 타입을 사용하고자 할 때 사용
+
 class DataStorage<T extends string | number | boolean> {
   private data: T[] = [];
 
