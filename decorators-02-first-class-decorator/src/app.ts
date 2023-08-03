@@ -16,6 +16,7 @@
 // 팩토리 함수와 함께 실행하면 데코레이션 함수가 사용하는 값을 커스터마이즈할 수 있음
 // 데코레이터를 내부 설정에 사용할 때보다 많은 영향력과 가능성을 펼칠 수 있음
 function Logger(logString: string) {
+  console.log("LOGGER FACTORY");
   return function (constructor: Function) {
     console.log(logString);
     console.log(constructor);
@@ -34,6 +35,8 @@ function WithTemplate(template: string, hookId: string) {
   // 우리는 화면에 렌더되는 것을 만듦
   // 단 개발자에게 노출되는 도구를 가지고!
   // 컴포넌트처럼 사용할 수 있다. Angular의 작동방식과 유사함!
+  console.log("TEMPLATE FACTORY");
+
   return function (constructor: any) {
     const hookEl = document.getElementById(hookId);
     const p = new constructor();
@@ -49,6 +52,17 @@ function WithTemplate(template: string, hookId: string) {
 // 데코레이터 함수를 실행하는 것이 아니라 데코레이터 함수와 같은 걸 반환해 줄 함수를 실행하는 것
 //장점은 값을 건너 뛸 수 있다는 것. 내부 반환 데코레이터 함수로 대체되어서.
 
+// 데코레이터가 여러개인 경우, 아래에 있는 데코레이터가 먼저 실행된다
+// 하지만 팩토리 함수의 경우 우리가 명시한 순서대로 실행됨
+// 아래와 같이 실행된다
+// 1. Logger의 팩토리 함수 (console.log("LOGGER FACTORY");)
+// 2. WithTemplate의 팩토리 함수 (console.log("TEMPLATE FACTORY");)
+// 3. WithTemplate의 데코레이터 (return 부분)
+// 4. Logger의 데코레이터 (return 부분)
+// 팩토리 함수가 없는 데코레이터는 데코레이터가 실행되는 순서에 맞게 실행됨
+// 예를 들어, A(팩), B, C(팩) > @A; @B; @C 를 하는 경우
+// A팩 > C팩 > C데 > B데 > A데 순서로 실행됨
+@Logger("Logging")
 @WithTemplate("<h1>My Personal Object</h1>", "app")
 class Person {
   name = "Max";
