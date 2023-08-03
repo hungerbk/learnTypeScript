@@ -22,10 +22,34 @@ function Logger(logString: string) {
   };
 }
 
+function WithTemplate(template: string, hookId: string) {
+  // 이 내부에서 return 되는 것이 실제 데코레이터임!
+  // return function (_: Function) {
+  //   const hookEl = document.getElementById(hookId);
+  //   if (hookEl) {
+  //     hookEl.innerHTML = template;
+  //   }
+  // };
+
+  // 우리는 화면에 렌더되는 것을 만듦
+  // 단 개발자에게 노출되는 도구를 가지고!
+  // 컴포넌트처럼 사용할 수 있다. Angular의 작동방식과 유사함!
+  return function (constructor: any) {
+    const hookEl = document.getElementById(hookId);
+    const p = new constructor();
+    if (hookEl) {
+      hookEl.innerHTML = template;
+      hookEl.querySelector("h1")!.textContent = p.name; // Max 출력됨
+    }
+  };
+}
+
 // @: 코딩에서 읽히거나 찾게 되는 특별한 식별자 상징
-@Logger("Logging - Person")
+// @Logger("Logging - Person")
 // 데코레이터 함수를 실행하는 것이 아니라 데코레이터 함수와 같은 걸 반환해 줄 함수를 실행하는 것
 //장점은 값을 건너 뛸 수 있다는 것. 내부 반환 데코레이터 함수로 대체되어서.
+
+@WithTemplate("<h1>My Personal Object</h1>", "app")
 class Person {
   name = "Max";
 
