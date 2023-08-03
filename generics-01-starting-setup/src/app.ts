@@ -139,3 +139,37 @@ const numberStorage = new DataStorage<number>();
 // const maxObj = { name: "Max" };
 // objStorage.addItem(maxObj);
 // objStorage.removeItem(maxObj);
+
+// Partial 타입
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
+}
+
+function createCourseGoal(title: string, description: string, completeUntil: Date): CourseGoal {
+  // Partial 타입은 타입스크립트에게 중괄호쌍이  CourseGoal이 되는 객체임을 알려줌
+  // 그리고 우리가 만든 타입의 모든 속성을 선택적인 것으로 만듦
+  // Partial 타입은 모든 속성을 선택적인 객체 타입으로 만든다
+  // 그래서 빈 중괄호를 추가하여 속성을 하나하나 단계적으로 추가할 수 있음
+  // 하지만 이를 반환할 수는 없음!!
+  // 이것은 Partial<CourseGoal>타입이지 일반 CourseGoal 타입이 아님!!
+  let courseGoal: Partial<CourseGoal> = {};
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = completeUntil;
+  //이것은 Partial<CourseGoal>타입이지 일반 CourseGoal 타입이 아님!! >>> 이 문제를 아래와 같이 해결할 수 있음
+  return courseGoal as CourseGoal;
+}
+
+// Readonly 타입
+// 이 변수는 읽기만 가능한 문자열 배열이기 때문에 push나 pop을 사용할 수 없음
+// 객체에도 사용해서 객체의 속성을 변경하거나 추가할 수 없게 할 수 있다
+const names: Readonly<string[]> = ["Max", "Anna"];
+// names.push("Manu"); //에러
+// names.pop(); //에러
+
+// 위와 같은 유틸리티 타입은 타입스크립트에만 존재하기 때문에 다른 언어로 컴파일 할 수 없음
+// 하지만 컴파일 단계에서 코드를 엄격하게 작성하고 확인 단계를 추가하거나 특정한 확인 단계를 생략할 수 있게 함
+// 무언가에 제약조건을 설정하거나 특정한 제약조건은 생략할 때 쓸 수 있다
+// 이런 유틸리티 타입도 특정 타입에만 쓸 수 있는 것이 아니라, 객체, 배열, 문자열, 숫자 등.. 에 쓸 수 있기 때문에 제네릭 타입임!
