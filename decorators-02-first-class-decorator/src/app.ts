@@ -75,3 +75,33 @@ class Person {
 const pers = new Person();
 
 console.log(pers);
+
+// ---
+
+function Log(target: any, propertyName: string | Symbol) {
+  console.log("Property decorator!");
+  console.log(target, propertyName);
+}
+
+class Product {
+  @Log // 자바스크립트에서 프로퍼티를 정의했을 때 클래스의 한 부분으로 실행됨. 우리가 만든 컨스트럭터 함수의 부분으로!
+  title: string;
+  private _price: number;
+
+  set price(val: number) {
+    if (val > 0) {
+      this._price = val;
+    } else {
+      throw new Error("Invalid price - should be positive !");
+    }
+  }
+
+  constructor(t: string, p: number) {
+    this.title = t;
+    this._price = p;
+  }
+
+  getPriceWithTax(tax: number) {
+    return this._price * (1 + tax);
+  }
+}
