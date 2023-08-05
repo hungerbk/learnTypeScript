@@ -219,11 +219,16 @@ function Required(target: any, propName: string) {
   // 항상 정해진 클래스 이름의 registeredValidator를 새로운 객체로 덮어쓰고 있음
   // 그 대신 여기 기존의 validator를 추가하여 그렇게 하지 말아야 함
   // 스프에드 연산자를 이용하여 기존 키-값 쌍을 가져온 뒤 그것을 추가하고 새로운 값을 추가하게 함
-  registeredValidators[target.constructor.name] = { ...registeredValidators[target.constructor.name], [propName]: ["required"] };
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    // 지금은 하나의 값(검증자)만 저장되어 있지만, 여러가지의 값이 저장될 수 있게 해야 함
+    // 그래서 아래와 같이 스프레드 연산자를 사용해서 기존 값이 있는 경우 그 값들도 저장할 수 있게 수정
+    [propName]: [...(registeredValidators[target.constructor.name]?.[propName] ?? []), "required"],
+  };
 }
 
 function PositiveNumber(target: any, propName: string) {
-  registeredValidators[target.constructor.name] = { ...registeredValidators[target.constructor.name], [propName]: ["positive"] };
+  registeredValidators[target.constructor.name] = { ...registeredValidators[target.constructor.name], [propName]: [...(registeredValidators[target.constructor.name]?.[propName] ?? []), "positive"] };
 }
 
 function validate(obj: any) {
