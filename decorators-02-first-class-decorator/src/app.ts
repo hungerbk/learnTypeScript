@@ -201,15 +201,60 @@ button.addEventListener("click", p.showMessage); // 이제 이렇게만 작성�
 
 // 파일 검사용 데코레이터
 
+interface ValidatorConfig {
+  [property: string]: {
+    [validatableProp: string]: string[]; // ['required', 'positive']
+  };
+}
+
+const registeredValidators: ValidatorConfig = {}; //
+
 // Required(), PositiveNumber(), validate()는 외부 라이브러리가 될 수 있음
 // 이 안에는 이 클래스를 저장할 수 있는 일종의 저장소가 있고, title은 Required 되기를 바라고 있음. 그리고 validate는 우리가 object 클래스 용으로 가지고 있는 객체용 저장소가 그것에 기반하고 있는지를 확인할 수 있음
 // Required(), PositiveNumber() 유효성 검사 및 등록
 // validate() 유효성 검사 로직
-function Required() {}
+function Required(target: any, propName: string) {
+  //프로퍼티를 위한 디스크립터는 없다
 
-function PositiveNumber() {}
+  // 항상 정해진 클래스 이름의 registeredValidator를 새로운 객체로 덮어쓰고 있음
+  // 그 대신 여기 기존의 validator를 추가하여 그렇게 하지 말아야 함
+  // 스프에드 연산자를 이용하여 기존 키-값 쌍을 가져온 뒤 그것을 추가하고 새로운 값을 추가하게 함
+  registeredValidators[target.constructor.name] = { ...registeredValidators[target.constructor.name], [propName]: ["required"] };
+}
 
-function validate(obj: object) {}
+function PositiveNumber(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = { ...registeredValidators[target.constructor.name], [propName]: ["positive"] };
+}
+
+function validate(obj: any) {
+  const objValidatorConfig = registeredValidators[obj.constructor.name];
+  if (!objValidatorConfig) {
+    return true; // 유효성 검사를 할 것이 없기 때문에 객체는 유효한 것 => true 반환
+  }
+  // 유효성 검사를 할 것이 있는 경우 아래 코드가 실행 됨
+  let isValid = true;
+  for (const prop in objValidatorConfig) {
+    for (const validator of objValidatorConfig[prop]) {
+      // validator가 하나라도 true나 false를 반환하는 경우 바로 return함.
+      // 둘다 flase인 경우에는 문제가 되지 않음. 하지만 하나라도 true가 되는 경우 문제가 됨
+      // title이 비어있고 price가 유효한 경우 price가 true이기 때문에 title을 확인하지 않고 true를 리턴함..! => 이게 우리가 해결해야 하는 문제
+      // 이걸 해결하기 위해 isValid를 추가할 것임
+      // 그리고 바로 return 하는 것이 아니라 isValid를 수정하고 리턴할 것임
+      switch (validator) {
+        case "required":
+          // return !!obj[prop]; // truthy => true, falsy => false로 반환
+          isValid = isValid && !!obj[prop];
+          break;
+        case "positive":
+          // return obj[prop] > 0;
+          isValid = isValid && obj[prop] > 0;
+          break;
+      }
+    }
+  }
+  // return true;
+  return isValid; // 처음 본 값이 아니라 모든 값을 검사한 뒤에 값을 리턴하게 함
+}
 
 class Course {
   @Required
