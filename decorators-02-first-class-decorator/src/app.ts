@@ -37,13 +37,20 @@ function WithTemplate(template: string, hookId: string) {
   // 컴포넌트처럼 사용할 수 있다. Angular의 작동방식과 유사함!
   console.log("TEMPLATE FACTORY");
 
-  return function (constructor: any) {
-    const hookEl = document.getElementById(hookId);
-    const p = new constructor();
-    if (hookEl) {
-      hookEl.innerHTML = template;
-      hookEl.querySelector("h1")!.textContent = p.name; // Max 출력됨
-    }
+  return function <T extends { new (...args: any[]): { name: string } }>(originalConstructor: T) {
+    // 데코레이터는 새 함수, 컨스트럭터 함수, 클래스를 반환할 수 있음
+    // 여기에 있는 클래스는 익명이어도 됨
+    return class extends originalConstructor {
+      constructor(..._: any[]) {
+        super(); // originalconstructor 호출
+        console.log("Rendering Template");
+        const hookEl = document.getElementById(hookId);
+        if (hookEl) {
+          hookEl.innerHTML = template;
+          hookEl.querySelector("h1")!.textContent = this.name; // Max 출력됨
+        }
+      }
+    };
   };
 }
 
@@ -72,9 +79,14 @@ class Person {
   }
 }
 
-const pers = new Person();
+// pers를 주석처리하면, WithTemplate의 데코레이터는 실행되지만 화면에 그려지지는 않는다
+// 그냥 함수나 팩토리 함수에서 정의하면은 안 됨
+// 데코레이터가 무언가를 반환할 수 있기 때문에 가능한 것임
+// 데코레이터에 더해진 것을 대체하는 것임
 
-console.log(pers);
+// const pers = new Person();
+
+// console.log(pers);
 
 // ---
 
