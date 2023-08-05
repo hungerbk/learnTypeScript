@@ -98,15 +98,11 @@ function Log(target: any, propertyName: string | Symbol) {
 // 무언가를 반환하고 그 값을 타스가 사용할 수 있는 데코레이터는 메서드 데코레이터나 액세서 데코레이터임 > 새로운 디스크립터 객체를 반환할 수 있고, 그 값을 타스에 확인해줄 수 있음
 // 프로퍼티와 파라메터 데코레이터도 어떤 값을 반환하지만 타스는 그 값들을 무시함. 사용되지 않음
 // 프로퍼티 디스크립터는 바닐라 자바스크립트임
-function Log2(target: any, name: string, descriptor: PropertyDescriptor): PropertyDescriptor {
+function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
   console.log("Accessor decorator!");
   console.log(target);
   console.log(name);
   console.log(descriptor);
-  return {
-    // 반환 값을 PropertyDescriptor로 설정한 뒤
-    // get, set, configurable, enumerable 등을 변경할 수 있음
-  };
 }
 
 function Log3(target: any, name: string | Symbol, descriptor: PropertyDescriptor) {
@@ -153,3 +149,52 @@ class Product {
     return this._price * (1 + tax);
   }
 }
+
+// 프로덕트 클래스를 사용할 때 데코레이터가 실행되는 것이 아니라
+// 클래스가 정의될 때 데코레이터가 실행 됨
+const p1 = new Product("book", 19);
+const p2 = new Product("book 2", 26);
+
+// 우리는 target이나 methodName에는 관심이 없기 때문에 이를 _로 대체함
+function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  // 우리는 Autobind안에 있는 this가 항상 이 메서드가 속해 있는 객체가 되게 하고 싶음!
+  const originalMethod = descriptor.value; // 이렇게 하면 원래 메서드에 접근할 수 있음
+  const adjDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    get() {
+      const boundFn = originalMethod.bind(this); // 여기에서 this는 getter 메서드를 대체함. getter를 트리거하는 것은 무엇이든지 참조함
+      // getter 메서드는 그것이 속해 있는 확실한 객체로 트리거 됨 >>> this는 getter를 대신에 항상 우리가 정의를 객체를 참조함
+      // getter는 이벤트 리스너로 재정의되지 않음
+      // 그것이 속한 객체, 그리고 이벤트 리스너 사이의 추가적인 계층 같은 것이기 때문
+
+      // 여기에서 이렇게 bind를 했기 때문에 이제 어디에서 실행하든 항상 같은 객체를 참조하게 됨!
+      // 일일이 이벤트리스너에 bind를 하지 않아도 됨!!
+      return boundFn;
+    },
+  };
+  return adjDescriptor; // 우리가 만든 Autobind 데코레이터 함수가 새로운 adjDescriptor 데코레이터를 반환하면 이 디스크립터 객체가 이전의 디스크립터 객체를 덮어씀
+  // 그러면 타스는 이전의 디스크립터를 대체함 > 새로운 구성으로 대체되고, getter 계층이 추가되는 것
+}
+
+class Printer {
+  message = "This works!";
+
+  @Autobind
+  showMessage() {
+    // 이메서드는 항상 객체가 됨
+    // this는 항상 같은 대상을 참조하는 것이 아님
+    // p.showMessage; 에서는 Printer를 참조하지만
+    // 이벤트 리스너를 사용하면 이벤트 대상을 참조함
+    // 이벤트 리스너가 실행되어야 하는 함수 안에 있는 this와 이벤트 대상을 바인딩하기 때문
+    console.log(this.message);
+  }
+}
+
+const p = new Printer();
+
+// p.showMessage; // 여기에서 this는 Printer
+const button = document.querySelector("button")!;
+// button.addEventListener("click", p.showMessage); //여기에서 this는 button.
+// button.addEventListener("click", p.showMessage.bind(p)); //이렇게 p를 바인딩하면 해결할 수 있음 (이것은 자바스크립트!)
+button.addEventListener("click", p.showMessage); // 이제 이렇게만 작성해도 (Autobind 덕분에) 항상 같은 객체를 참조함
