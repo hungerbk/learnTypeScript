@@ -95,11 +95,18 @@ function Log(target: any, propertyName: string | Symbol) {
   console.log(target, propertyName);
 }
 
-function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
+// 무언가를 반환하고 그 값을 타스가 사용할 수 있는 데코레이터는 메서드 데코레이터나 액세서 데코레이터임 > 새로운 디스크립터 객체를 반환할 수 있고, 그 값을 타스에 확인해줄 수 있음
+// 프로퍼티와 파라메터 데코레이터도 어떤 값을 반환하지만 타스는 그 값들을 무시함. 사용되지 않음
+// 프로퍼티 디스크립터는 바닐라 자바스크립트임
+function Log2(target: any, name: string, descriptor: PropertyDescriptor): PropertyDescriptor {
   console.log("Accessor decorator!");
   console.log(target);
   console.log(name);
   console.log(descriptor);
+  return {
+    // 반환 값을 PropertyDescriptor로 설정한 뒤
+    // get, set, configurable, enumerable 등을 변경할 수 있음
+  };
 }
 
 function Log3(target: any, name: string | Symbol, descriptor: PropertyDescriptor) {
