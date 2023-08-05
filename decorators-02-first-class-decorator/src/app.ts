@@ -198,3 +198,53 @@ const button = document.querySelector("button")!;
 // button.addEventListener("click", p.showMessage); //여기에서 this는 button.
 // button.addEventListener("click", p.showMessage.bind(p)); //이렇게 p를 바인딩하면 해결할 수 있음 (이것은 자바스크립트!)
 button.addEventListener("click", p.showMessage); // 이제 이렇게만 작성해도 (Autobind 덕분에) 항상 같은 객체를 참조함
+
+// 파일 검사용 데코레이터
+
+// Required(), PositiveNumber(), validate()는 외부 라이브러리가 될 수 있음
+// 이 안에는 이 클래스를 저장할 수 있는 일종의 저장소가 있고, title은 Required 되기를 바라고 있음. 그리고 validate는 우리가 object 클래스 용으로 가지고 있는 객체용 저장소가 그것에 기반하고 있는지를 확인할 수 있음
+// Required(), PositiveNumber() 유효성 검사 및 등록
+// validate() 유효성 검사 로직
+function Required() {}
+
+function PositiveNumber() {}
+
+function validate(obj: object) {}
+
+class Course {
+  @Required
+  title: string;
+  @PositiveNumber
+  price: number;
+
+  constructor(t: string, p: number) {
+    this.title = t;
+    this.price = p;
+  }
+}
+
+// 유효한 title과 price를 입력해야함
+// 1. fetch를 이용하여 외부 리소스를 불러옴
+// 2. 사용자가 직접 입력하게 하여 그 정보를 사용함 => 이 경우에 입력한 값이 유효한지 확인해야 하기 때문에 유효성 검사를 해야 함!!
+
+const courseForm = document.querySelector("form");
+courseForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const titleEl = document.getElementById("title") as HTMLInputElement;
+  const priceEl = document.getElementById("price") as HTMLInputElement;
+
+  const title = titleEl.value;
+  const price = +priceEl.value;
+
+  // 여기에 if 문을 이용해 유효성 검사를 할 수 있지만, 그러면 우리가 새로운 Course를 추가할 때마다 if문을 작성해야한다는 것을 의미함..!!
+  // => 데코레이터를 이용해서 Course 클래스에 유효성 검사 로직을 추가하면 아주 좋겠다!!
+
+  const createdCourse = new Course(title, price);
+
+  // 유효성 검사를 실행함
+  if (!validate(createdCourse)) {
+    alert("Invalid input, please try again!");
+    return;
+  }
+  console.log(createdCourse);
+});
