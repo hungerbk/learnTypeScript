@@ -83,11 +83,36 @@ function Log(target: any, propertyName: string | Symbol) {
   console.log(target, propertyName);
 }
 
+function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log("Accessor decorator!");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function Log3(target: any, name: string | Symbol, descriptor: PropertyDescriptor) {
+  console.log("Method decorator!");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function Log4(target: any, name: string | Symbol, position: number) {
+  console.log("Parameter decorator!");
+  console.log(target);
+  console.log(name);
+  console.log(position);
+}
+
 class Product {
   @Log // 자바스크립트에서 프로퍼티를 정의했을 때 클래스의 한 부분으로 실행됨. 우리가 만든 컨스트럭터 함수의 부분으로!
   title: string;
   private _price: number;
 
+  // 액세서 데코레이터
+  @Log2 // 내부 프로퍼티(_price)가 아니라 외부 액세서(price)가 출력됨
+  // 아래 set 함수가 프로퍼티 디스크립터로 출력됨
+  // 액세서 데코레이터는 set, get 출력
   set price(val: number) {
     if (val > 0) {
       this._price = val;
@@ -101,7 +126,11 @@ class Product {
     this._price = p;
   }
 
-  getPriceWithTax(tax: number) {
+  // 메서드 데코레이터
+  @Log3 // 메서드 데코레이터는 어떤 것이든 받을 수 있다
+  // 메서드 데코레이터는 value, writable이 출력
+  getPriceWithTax(@Log4 tax: number) {
+    // 파라메터 데코레이터
     return this._price * (1 + tax);
   }
 }
