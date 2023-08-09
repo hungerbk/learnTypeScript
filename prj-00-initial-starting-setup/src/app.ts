@@ -1,7 +1,22 @@
+// Project Type
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  constructor(public id: string, public title: string, public description: string, public people: number, public status: ProjectState) {}
+}
+
 // Project State Management
+type Listener = (items: Project[]) => void;
+// 리스너는 함수의 배열임!
+// 리스너로 작업하는 부분은 반환값이 필요 없음
+
 class ProjectState {
-  private listeners: any[] = []; // 리스너 목록 관리. 함수 참조 리스트
-  private projects: any[] = [];
+  // 결국 리스너는 리스너 함수 배열이다
+  private listeners: Listener[] = []; // 리스너 목록 관리. 함수 참조 리스트
+  private projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {}
@@ -14,17 +29,12 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 
   addProject(title: string, description: string, numberOfPeople: number) {
-    const newProject = {
-      id: Math.random().toString(), // 원래 이렇게 난수로 하는 것은 고유 아이디를 만드는 것이 아님. 지금은 데모니까 그냥 이렇게만 하기
-      title: title,
-      description: description,
-      people: numberOfPeople,
-    };
+    const newProject = new Project(Math.random().toString(), title, description, numberOfPeople, ProjectStatus.Active);
     this.projects.push(newProject);
     // 모든 리스너 함수를 불러온 뒤
     for (const listenerFn of this.listeners) {
@@ -86,7 +96,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
-  assignedProjects: any[];
+  assignedProjects: Project[];
 
   // 활성화된 리스트와 비활성화된 리스트를 구분할 것이기 때문에 type을 추가함(이렇게 쓰면 type을 쓸 수 있음)
   constructor(private type: "active" | "finished") {
@@ -99,7 +109,7 @@ class ProjectList {
     // 프로젝트 리스트가 하나 이상이기 때문에 id를 하드코딩하면 안되고 동적으로 생성되게 해야 한다
     this.element.id = `${this.type}-projects`;
 
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       this.assignedProjects = projects;
       this.renderProjects(); // 순서상 이게 먼저 실랭된 것처럼 보이지만, 콘텐츠가 생성이 된 뒤에 추가할 수 있기 때문에, 사실은 this.renderContent(); 가 먼저 실행 됨
     });
@@ -112,7 +122,7 @@ class ProjectList {
     const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement("li");
-      listItem.textContent = prjItem.title;
+      listItem.textContent = prjItem.title; // 이제 타입스크립트가 여기에 입력하는 타입을 이해함. 그래서 다른 속성을 입력하면 에러가 발생함
       listEl.appendChild(listItem);
     }
   }
