@@ -1,3 +1,42 @@
+// Project State Management
+class ProjectState {
+  private listeners: any[] = []; // 리스너 목록 관리. 함수 참조 리스트
+  private projects: any[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+
+  addProject(title: string, description: string, numberOfPeople: number) {
+    const newProject = {
+      id: Math.random().toString(), // 원래 이렇게 난수로 하는 것은 고유 아이디를 만드는 것이 아님. 지금은 데모니까 그냥 이렇게만 하기
+      title: title,
+      description: description,
+      people: numberOfPeople,
+    };
+    this.projects.push(newProject);
+    // 모든 리스너 함수를 불러온 뒤
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice()); // 해당하는 함수를 실행 // 이때 참조복사가 아니라 새로운 복사 값으로 전송하도록 함(리스너 함수의 출처는 수정X)
+    }
+  }
+}
+
+// 전역상수를 설정하여 다른 데서도 사용할 수 있게 하기
+// 아래처럼 static 메서드를 사용하는 방식으로 하면 항상 같은 객체로 작업할 수 있음 => 우리가 이렇게 작업해둠. 하나의 객체만 반환함
+const projectState = ProjectState.getInstance();
+
 // Validation
 interface Validatable {
   value: string | number;
@@ -47,18 +86,35 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
+  assignedProjects: any[];
 
   // 활성화된 리스트와 비활성화된 리스트를 구분할 것이기 때문에 type을 추가함(이렇게 쓰면 type을 쓸 수 있음)
   constructor(private type: "active" | "finished") {
     this.templateElement = document.getElementById("project-list")! as HTMLTemplateElement;
     this.hostElement = document.getElementById("app")! as HTMLDivElement;
+    this.assignedProjects = []; // 빈 배열로 초기화
 
     const importedNode = document.importNode(this.templateElement.content, true);
     this.element = importedNode.firstElementChild as HTMLElement;
     // 프로젝트 리스트가 하나 이상이기 때문에 id를 하드코딩하면 안되고 동적으로 생성되게 해야 한다
     this.element.id = `${this.type}-projects`;
+
+    projectState.addListener((projects: any[]) => {
+      this.assignedProjects = projects;
+      this.renderProjects(); // 순서상 이게 먼저 실랭된 것처럼 보이지만, 콘텐츠가 생성이 된 뒤에 추가할 수 있기 때문에, 사실은 this.renderContent(); 가 먼저 실행 됨
+    });
+
     this.attach();
     this.renderContent();
+  }
+
+  private renderProjects() {
+    const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+    for (const prjItem of this.assignedProjects) {
+      const listItem = document.createElement("li");
+      listItem.textContent = prjItem.title;
+      listEl.appendChild(listItem);
+    }
   }
 
   private renderContent() {
@@ -149,7 +205,7 @@ class ProjectInput {
     if (Array.isArray(userInput)) {
       // 자바스크립트에는 튜플이 없음. 타스에서의 튜플은 자스에서 배열이기 때문에 배열인지 확인(물론 튜플과 배열이 일치하는 것은 아니지만.. 튜플은 일단 배열이다)
       const [title, desc, people] = userInput;
-      console.log(title, desc, people);
+      projectState.addProject(title, desc, people);
       this.clearInput();
     }
   }
