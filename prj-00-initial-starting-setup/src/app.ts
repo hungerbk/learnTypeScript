@@ -5,7 +5,7 @@ enum ProjectStatus {
 }
 
 class Project {
-  constructor(public id: string, public title: string, public description: string, public people: number, public status: ProjectState) {}
+  constructor(public id: string, public title: string, public description: string, public people: number, public status: ProjectStatus) {}
 }
 
 // Project State Management
@@ -110,7 +110,13 @@ class ProjectList {
     this.element.id = `${this.type}-projects`;
 
     projectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects;
+      const relevantProjects = projects.filter((prj) => {
+        if (this.type === "active") {
+          return prj.status === ProjectStatus.Active;
+        }
+        return prj.status === ProjectStatus.Finished;
+      });
+      this.assignedProjects = relevantProjects;
       this.renderProjects(); // 순서상 이게 먼저 실랭된 것처럼 보이지만, 콘텐츠가 생성이 된 뒤에 추가할 수 있기 때문에, 사실은 this.renderContent(); 가 먼저 실행 됨
     });
 
@@ -120,6 +126,9 @@ class ProjectList {
 
   private renderProjects() {
     const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+    // 이부분은 리스트 항목을 모두 확인하고 새로 붙이는데, 리스트가 기존에 존재할 수 있기 때문에 에러가 발생함 > 항목이 중복으로 노출됨
+    // 제일 좋은 것은 기존에 있는 것과 추가해야할 것을 비교하여 없는 것만 추가하는 것. 하지만 dom을 비교하는 것은 어렵다
+    listEl.innerHTML = ""; // 이렇게 리스트를 비운 뒤 새로 추가해도 됨. 그러면 항목을 추가할 때마다 전체가 다시 리렌더링됨. 지금 앱에선 괜찮음
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement("li");
       listItem.textContent = prjItem.title; // 이제 타입스크립트가 여기에 입력하는 타입을 이해함. 그래서 다른 속성을 입력하면 에러가 발생함
