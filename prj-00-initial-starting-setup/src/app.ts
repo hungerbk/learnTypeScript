@@ -9,17 +9,27 @@ class Project {
 }
 
 // Project State Management
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
 // 리스너는 함수의 배열임!
 // 리스너로 작업하는 부분은 반환값이 필요 없음
 
-class ProjectState {
+class State<T> {
   // 결국 리스너는 리스너 함수 배열이다
-  private listeners: Listener[] = []; // 리스너 목록 관리. 함수 참조 리스트
+  protected listeners: Listener<T>[] = []; // 리스너 목록 관리. 함수 참조 리스트
+  // protected 클래스 밖에서 접근할 수 없지만, 상속받은 클래스에서는 접근할 수 있음
+
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+}
+
+class ProjectState extends State<Project> {
   private projects: Project[] = [];
   private static instance: ProjectState;
 
-  private constructor() {}
+  private constructor() {
+    super();
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -27,10 +37,6 @@ class ProjectState {
     }
     this.instance = new ProjectState();
     return this.instance;
-  }
-
-  addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
   }
 
   addProject(title: string, description: string, numberOfPeople: number) {
@@ -91,24 +97,52 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   return adjDescriptor;
 }
 
-// projectList class
-class ProjectList {
+// Component Base Class
+// 클래스를 추상화하여 직접 인스턴스를 만들 수 없게 함
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+  // templateElement는 항상 HTMLTemplateElement지만, hostElement와 element는 아님. 상황에 따라 더 세부적이기도/다르기도 함 => 제네릭을 이용
+  // 위 처럼 제네릭을 사용하면, 이 클래스로부터 상속을 받을 때마다 구현타입을 정할 수 있고, 우리가 상속받는 다양한 위치에서 다양한 타입으로 작업이 가능함
   templateElement: HTMLTemplateElement;
-  hostElement: HTMLDivElement;
-  element: HTMLElement;
+  hostElement: T;
+  element: U;
+
+  // 필수 매개변수는 선택적 매개변수 앞에!
+  constructor(templateId: string, hostElementId: string, insertAtStart: boolean, newElementId?: string) {
+    this.templateElement = document.getElementById(templateId)! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(hostElementId)! as T;
+
+    const importedNode = document.importNode(this.templateElement.content, true);
+    this.element = importedNode.firstElementChild as U;
+    if (newElementId) {
+      // optional 이기 때문에 if문에 넣어줘야 함
+      this.element.id = newElementId;
+    }
+
+    this.attach(insertAtStart);
+  }
+  private attach(insertAtBiginning: boolean) {
+    this.hostElement.insertAdjacentElement(insertAtBiginning ? "afterbegin" : "beforeend", this.element);
+  }
+
+  abstract configure(): void;
+  abstract renderContent(): void;
+}
+
+// projectList class
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[];
 
   // 활성화된 리스트와 비활성화된 리스트를 구분할 것이기 때문에 type을 추가함(이렇게 쓰면 type을 쓸 수 있음)
   constructor(private type: "active" | "finished") {
-    this.templateElement = document.getElementById("project-list")! as HTMLTemplateElement;
-    this.hostElement = document.getElementById("app")! as HTMLDivElement;
+    // super가 끝나기 전에는 this를 사용할 수 없다
+    super("project-list", "app", false, `${type}-projects-list`);
     this.assignedProjects = []; // 빈 배열로 초기화
 
-    const importedNode = document.importNode(this.templateElement.content, true);
-    this.element = importedNode.firstElementChild as HTMLElement;
-    // 프로젝트 리스트가 하나 이상이기 때문에 id를 하드코딩하면 안되고 동적으로 생성되게 해야 한다
-    this.element.id = `${this.type}-projects`;
+    this.configure();
+    this.renderContent();
+  }
 
+  configure() {
     projectState.addListener((projects: Project[]) => {
       const relevantProjects = projects.filter((prj) => {
         if (this.type === "active") {
@@ -119,9 +153,12 @@ class ProjectList {
       this.assignedProjects = relevantProjects;
       this.renderProjects(); // 순서상 이게 먼저 실랭된 것처럼 보이지만, 콘텐츠가 생성이 된 뒤에 추가할 수 있기 때문에, 사실은 this.renderContent(); 가 먼저 실행 됨
     });
+  }
 
-    this.attach();
-    this.renderContent();
+  renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.element.querySelector("ul")!.id = listId;
+    this.element.querySelector("h2")!.textContent = this.type.toUpperCase() + "PROJECTS";
   }
 
   private renderProjects() {
@@ -135,38 +172,16 @@ class ProjectList {
       listEl.appendChild(listItem);
     }
   }
-
-  private renderContent() {
-    const listId = `${this.type}-projects-list`;
-    this.element.querySelector("ul")!.id = listId;
-    this.element.querySelector("h2")!.textContent = this.type.toUpperCase() + "PROJECTS";
-  }
-
-  private attach() {
-    this.hostElement.insertAdjacentElement("beforeend", this.element);
-  }
 }
 
 // projectInput class
-class ProjectInput {
-  templateElement: HTMLTemplateElement;
-  hostElement: HTMLDivElement;
-  element: HTMLFormElement;
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
   peopleInputElement: HTMLInputElement;
 
   constructor() {
-    // getElementById()는 어떤 HTML 요소를 가져오는 지 확실히 알 수 없기 때문에 에러가 발생한다.
-    // 우리가 위에서 templateElement: HTMLTemplateElement; 라고 정의했기 때문에 발생하는 에러
-    // 그렇기 때문에 우리가 가져오는 요소가 HTMLTemplateElement라는 것을 알려줘야 함! 아래 두가지 방식을 쓸 수 있다
-    // this.templateElement = <HTMLTemplateElement>document.getElementById("project-input")!;
-    this.templateElement = document.getElementById("project-input")! as HTMLTemplateElement;
-    this.hostElement = document.getElementById("app")! as HTMLDivElement;
-
-    const importedNode = document.importNode(this.templateElement.content, true);
-    this.element = importedNode.firstElementChild as HTMLFormElement;
-    this.element.id = "user-input"; //요소에 id 지정
+    super("project-input", "app", true, "user-input");
 
     // 클래스에 기반하여 생성된 모든 객체에 접근할 수 있다
     this.titleInputElement = this.element.querySelector("#title") as HTMLInputElement;
@@ -174,8 +189,14 @@ class ProjectInput {
     this.peopleInputElement = this.element.querySelector("#people") as HTMLInputElement;
 
     this.configure();
-    this.attach();
   }
+
+  configure() {
+    // this.element.addEventListener("submit", this.submitHandler.bind(this)); // bind 하지 않으면 핸들러에서 에러가 발생함. this가 가리키는 대상이 다르기 때문. 하지만 이렇게 작성하는 것이 아니라 데코레이터를 이용해서 할 수 있음
+    this.element.addEventListener("submit", this.submitHandler);
+  }
+
+  renderContent() {}
 
   private gatherUserInput(): [string, string, number] | void {
     const enteredTitle = this.titleInputElement.value;
@@ -227,15 +248,6 @@ class ProjectInput {
       projectState.addProject(title, desc, people);
       this.clearInput();
     }
-  }
-
-  private configure() {
-    // this.element.addEventListener("submit", this.submitHandler.bind(this)); // bind 하지 않으면 핸들러에서 에러가 발생함. this가 가리키는 대상이 다르기 때문. 하지만 이렇게 작성하는 것이 아니라 데코레이터를 이용해서 할 수 있음
-    this.element.addEventListener("submit", this.submitHandler);
-  }
-
-  private attach() {
-    this.hostElement.insertAdjacentElement("afterbegin", this.element);
   }
 }
 
