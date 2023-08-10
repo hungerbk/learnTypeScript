@@ -135,7 +135,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   // 활성화된 리스트와 비활성화된 리스트를 구분할 것이기 때문에 type을 추가함(이렇게 쓰면 type을 쓸 수 있음)
   constructor(private type: "active" | "finished") {
     // super가 끝나기 전에는 this를 사용할 수 없다
-    super("project-list", "app", false, `${type}-projects-list`);
+    super("project-list", "app", false, `${type}-projects`);
     this.assignedProjects = []; // 빈 배열로 초기화
 
     this.configure();
