@@ -128,6 +128,25 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void;
 }
 
+// ProjectItem Class
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+  constructor(hostId: string, project: Project) {
+    super("single-project", hostId, false, project.id);
+    this.project = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {}
+  renderContent() {
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent = this.project.people.toString();
+    this.element.querySelector("p")!.textContent = this.project.description;
+  }
+}
+
 // projectList class
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[];
@@ -167,9 +186,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     // 제일 좋은 것은 기존에 있는 것과 추가해야할 것을 비교하여 없는 것만 추가하는 것. 하지만 dom을 비교하는 것은 어렵다
     listEl.innerHTML = ""; // 이렇게 리스트를 비운 뒤 새로 추가해도 됨. 그러면 항목을 추가할 때마다 전체가 다시 리렌더링됨. 지금 앱에선 괜찮음
     for (const prjItem of this.assignedProjects) {
-      const listItem = document.createElement("li");
-      listItem.textContent = prjItem.title; // 이제 타입스크립트가 여기에 입력하는 타입을 이해함. 그래서 다른 속성을 입력하면 에러가 발생함
-      listEl.appendChild(listItem);
+      new ProjectItem(this.element.querySelector("ul")!.id, prjItem); // element는 박스 그 자체. li나 ul이 아님. 그래서 그 안을 찾아서 넣어줘야 함
     }
   }
 }
