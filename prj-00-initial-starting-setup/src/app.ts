@@ -162,7 +162,10 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
 
   @autobind
   dragStartHandler(event: DragEvent) {
-    console.log(event);
+    event.dataTransfer!.setData("text/plain", this.project.id); // 드래그 이벤트 시, 브라우저와 자바스크립트가 데이터를 저장하고 붙일 수 있게 함
+    // dataTransfer는 우리가 어디에서 이벤트 리스너를 사용하냐에 따라 데이터 전송이 불가능할 수 있기 때문에 null이 올 수도 있음.
+    // 즉 모든 드래그 이벤트가 데이터 전송 객체가 있는 이벤트를 생성하지는 않음! > ! 써준 이유
+    event.dataTransfer!.effectAllowed = "move"; // 커서 모양을 조절하고 브라우저에 우리의 의도에 대해 더 알려줄 수 있음
   }
 
   dragEndHandler(_: DragEvent) {
@@ -196,12 +199,17 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
   }
 
   @autobind
-  dragOverHandler(_: DragEvent) {
-    const listEl = this.element.querySelector("ul")!;
-    listEl.classList.add("droppable");
+  dragOverHandler(event: DragEvent) {
+    if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+      event.preventDefault(); // 자바스크립트는 실제로 드롭을 막음 > 그래서 막는 것을 하지 않게 설정 > 우리가 허용한 곳에서는 드롭을 할 수 있게 하는 것
+      const listEl = this.element.querySelector("ul")!;
+      listEl.classList.add("droppable");
+    }
   }
 
-  dropHandler(_: DragEvent) {}
+  dropHandler(event: DragEvent) {
+    console.log(event.dataTransfer!.getData("text/plain")); // 드래그한 대상 id 추출
+  }
 
   @autobind
   dragLeaveHandler(_: DragEvent) {
