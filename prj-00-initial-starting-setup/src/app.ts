@@ -1,3 +1,15 @@
+// Drag & Drop Interface
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+  dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void; // 브라우저와 자바스크립트에 우리가 하고자 하는 드래그가 유효한 타겟임을 알려줌. 드래그 이벤트가 발생할 때마다 실행됨
+  dropHandler(event: DragEvent): void; // 드롭 이벤트. 드래그 핸들러가 드롭을 허용함.
+  dragLeaveHandler(event: DragEvent): void; // 사용자에게 비주얼 피드백을 줄 때 유용함. 변경사항이 없을 때에도 사용하여 비주얼 업데이트를 되돌림
+}
+
 // Project Type
 enum ProjectStatus {
   Active,
@@ -129,7 +141,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 }
 
 // ProjectItem Class
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
   private project: Project;
 
   get persons() {
@@ -148,7 +160,20 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     this.renderContent();
   }
 
-  configure() {}
+  @autobind
+  dragStartHandler(event: DragEvent) {
+    console.log(event);
+  }
+
+  dragEndHandler(_: DragEvent) {
+    console.log("DragEnd");
+  }
+
+  configure() {
+    this.element.addEventListener("dragstart", this.dragStartHandler);
+    this.element.addEventListener("dragend", this.dragEndHandler);
+  }
+
   renderContent() {
     this.element.querySelector("h2")!.textContent = this.project.title;
     this.element.querySelector("h3")!.textContent = this.persons + " assigned"; // getter는 일반 프로퍼티처럼 접근한다. () 붙이지 않음
