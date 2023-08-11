@@ -54,6 +54,19 @@ class ProjectState extends State<Project> {
   addProject(title: string, description: string, numberOfPeople: number) {
     const newProject = new Project(Math.random().toString(), title, description, numberOfPeople, ProjectStatus.Active);
     this.projects.push(newProject);
+    this.updateListeners();
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((prj) => prj.id === projectId);
+    if (project && project.status !== newStatus) {
+      // 드래그 앤 드롭을 하면 리렌더링되기 때문에 상태가 바뀌는 경우에만 리렌더링하도록 조건 추가
+      project.status = newStatus;
+      this.updateListeners(); // 이렇게 했기 때문에 다른 클래스에서도 우리가 만들어둔 리스너를 쓸 수 있음. 우리가 만든 리스너는 모두 저장하기 때문에
+    }
+  }
+
+  private updateListeners() {
     // 모든 리스너 함수를 불러온 뒤
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice()); // 해당하는 함수를 실행 // 이때 참조복사가 아니라 새로운 복사 값으로 전송하도록 함(리스너 함수의 출처는 수정X)
@@ -207,8 +220,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
     }
   }
 
+  @autobind
   dropHandler(event: DragEvent) {
-    console.log(event.dataTransfer!.getData("text/plain")); // 드래그한 대상 id 추출
+    const prjId = event.dataTransfer!.getData("text/plain"); // 드래그한 대상 id 추출
+    projectState.moveProject(prjId, this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished);
   }
 
   @autobind
