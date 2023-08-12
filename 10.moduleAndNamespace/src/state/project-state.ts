@@ -59,3 +59,8 @@ export class ProjectState extends State<Project> {
 // 전역상수를 설정하여 다른 데서도 사용할 수 있게 하기
 // 아래처럼 static 메서드를 사용하는 방식으로 하면 항상 같은 객체로 작업할 수 있음 => 우리가 이렇게 작업해둠. 하나의 객체만 반환함
 export const projectState = ProjectState.getInstance();
+// 이 상수는 여러 파일에서 임포트돼서 사용되고 있음
+// 그렇다면 여러번 임포트될 때마다 계속 상수가 생성되는 걸까?
+// 파일이 최초로 임포트되었을 때 1회만 실행됨
+// 다른 파일이 같은 파일을 임포트하는 경우 다시 실행되지 않음
+// console.log('RUNNING') 을 위에 입력하면 콘솔에 한번만 나옴. 다른 액션을 해도 더 출력되지 않음
