@@ -1,6 +1,6 @@
 // Component Base Class
 // 클래스를 추상화하여 직접 인스턴스를 만들 수 없게 함
-export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+export default abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   // templateElement는 항상 HTMLTemplateElement지만, hostElement와 element는 아님. 상황에 따라 더 세부적이기도/다르기도 함 => 제네릭을 이용
   // 위 처럼 제네릭을 사용하면, 이 클래스로부터 상속을 받을 때마다 구현타입을 정할 수 있고, 우리가 상속받는 다양한 위치에서 다양한 타입으로 작업이 가능함
   templateElement: HTMLTemplateElement;

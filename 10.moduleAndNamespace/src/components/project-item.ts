@@ -1,6 +1,6 @@
 import { Draggable } from "../models/drag-drop.js"; // 컴파일된 것을 전달해야 하기 때문에 js로 해야 함
 import { Project } from "../models/project.js";
-import { Component } from "./base-component.js";
+import Component from "./base-component.js";
 import { autobind } from "../decorators/autobind.js";
 
 // ProjectItem Class

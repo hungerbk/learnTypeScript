@@ -1,10 +1,10 @@
-import { Component } from "./base-component.js";
-import { Validatable, validate } from "../util/validation.js";
-import { autobind } from "../decorators/autobind.js";
+import Cmp from "./base-component.js"; // export default로 내보낸 것은 우리가 원하는 이름으로 가져올 수 있음
+import * as Validation from "../util/validation.js"; // 그룹화
+import { autobind as Autobind } from "../decorators/autobind.js"; //alias. A as B > 여기 파일에서는 A를 B로 사용하겠다
 import { projectState } from "../state/project-state.js";
 
 // projectInput class
-export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
+export class ProjectInput extends Cmp<HTMLDivElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
   peopleInputElement: HTMLInputElement;
@@ -32,16 +32,16 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     const enteredDescription = this.descriptionInputElement.value;
     const enteredPeople = this.peopleInputElement.value;
 
-    const titleValidatable: Validatable = {
+    const titleValidatable: Validation.Validatable = {
       value: enteredTitle,
       required: true,
     };
-    const descriptionValidatable: Validatable = {
+    const descriptionValidatable: Validation.Validatable = {
       value: enteredDescription,
       required: true,
       minLength: 5,
     };
-    const peopleValidatable: Validatable = {
+    const peopleValidatable: Validation.Validatable = {
       value: +enteredPeople,
       required: true,
       // index.html 에도 min, max가 설정되어 있지만, 여기에 새로 지정한 값이 적용됨
@@ -51,7 +51,7 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
     // if (enteredTitle.trim().length === 0 || enteredDescription.trim().length === 0 || enteredPeople.trim().length === 0) {
     // 위 코드를 재사용 가능한 검증으로 만들기
-    if (!validate(titleValidatable) || !validate(descriptionValidatable) || !validate(peopleValidatable)) {
+    if (!Validation.validate(titleValidatable) || !Validation.validate(descriptionValidatable) || !Validation.validate(peopleValidatable)) {
       alert("Invalid input, please try again!"); // 이 경우에는 튜플을 반환하지 않기 때문에 에러가 발생함. 아무것도 반환하지 않거나(return;), throw new Error해야 함
       return; // 물론 이 경우에도 튜플을 반환하는 것이 아니기 때문에, 튜플을 반환하거나 아무것도 반환하지 않도록 수정해야 함
       // 단, 함수는 undefined를 반환하지 못하게 하기 때문에 void를 입력한다
@@ -66,7 +66,7 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     this.peopleInputElement.value = "";
   }
 
-  @autobind
+  @Autobind
   private submitHandler(event: Event) {
     event.preventDefault(); // 기본으로 하는 http 제출을 막음
     // console.log(this.titleInputElement.value);
