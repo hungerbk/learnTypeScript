@@ -1,8 +1,3 @@
-/// <reference path='models/drag-drop.ts' />
-/// <reference path='models/project.ts' />
-/// <reference path='state/project-state.ts' />
-/// <reference path='util/validation.ts' />
-/// <reference path='decorators/autobind.ts' />
 /// <reference path='components/project-input.ts' />
 /// <reference path='components/project-list.ts' />
 // 슬래시 3개로 시작하는 것은 일반 주석이 아님. 타입스크립트가 채택하는 구문
