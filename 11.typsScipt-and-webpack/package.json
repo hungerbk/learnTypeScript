@@ -1,0 +1,24 @@
+{
+  "name": "understanding-typescript",
+  "version": "1.0.0",
+  "description": "Understanding TypeScript Course Setup",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "lite-server"
+  },
+  "keywords": [
+    "typescript",
+    "course"
+  ],
+  "author": "Maximilian Schwarzmüller",
+  "license": "ISC",
+  "devDependencies": {
+    "lite-server": "^2.5.4",
+    "ts-loader": "^9.4.4", // 웹팩과 함께 동작할 패키지. 웹팩에 타스를 어떻게 자스로 변환할지 전달. 이게 있기 때문에 웹팩이 타스를 자스로 변환할 수 있는 것임 
+    "typescript": "^5.1.6", // 우리가 이걸 이미 글로벌로 설치했기 때문에 tsc -w를 사용할 수 있음. 하지만 프로젝트마다 typescript의 사본을 설치하는 것은 좋은 관행이다. 프로젝트를 위한 특정 버전의 타스로 고정할 수 있음. 충돌을 방지할 수 있다
+    "webpack": "^5.88.2", //우리 코드를 묶고 변환하기 위한 특정 기능들을 플러그인하도록 해줌. 변환하는 것이 중요. 타입스크립트 프로젝트를 자바스크립트 파일로 변환해서 내보냄
+    "webpack-cli": "^5.1.4", // 프로젝트에서 웹팩 명령어를 사용하기 위해 필요
+    "webpack-dev-server": "^4.15.1" // 개발 서버 내에서 빌트하기 위해 필요. 파일 변경 사항을 점검하고 무언가 변견사항이 생겼을 때 웹페이지를 리컴파일함.
+  }
+}
