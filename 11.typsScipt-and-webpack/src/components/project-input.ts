@@ -1,7 +1,7 @@
-import Cmp from "./base-component.js"; // export default로 내보낸 것은 우리가 원하는 이름으로 가져올 수 있음
-import * as Validation from "../util/validation.js"; // 그룹화
-import { autobind as Autobind } from "../decorators/autobind.js"; //alias. A as B > 여기 파일에서는 A를 B로 사용하겠다
-import { projectState } from "../state/project-state.js";
+import Cmp from "./base-component"; // export default로 내보낸 것은 우리가 원하는 이름으로 가져올 수 있음
+import * as Validation from "../util/validation"; // 그룹화
+import { autobind as Autobind } from "../decorators/autobind"; //alias. A as B > 여기 파일에서는 A를 B로 사용하겠다
+import { projectState } from "../state/project-state";
 
 // projectInput class
 export class ProjectInput extends Cmp<HTMLDivElement, HTMLFormElement> {
