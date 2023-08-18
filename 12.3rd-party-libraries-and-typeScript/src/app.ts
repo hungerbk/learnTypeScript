@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { plainToClass } from "class-transformer"; //타입스크립트에서 잘 동작하지만 타입스크립트 지정 기능을 사용하는 것은 아님. 주로 타스에서 잘 동작되게 만들어졌지만 바닐라자바스크립트에서도 동작함(클래스는 자스에도 있는거니까)
+import { validate } from "class-validator";
 
 import { Product } from "./product.model";
 // import _ from "lodash";
@@ -8,6 +9,17 @@ const products = [
   { title: "A Carpet", price: 29.99 },
   { title: "A Book", price: 10.99 },
 ];
+
+const newProd = new Product("", -5.99);
+// 우리가 인스턴스화한 변수에서 실행해야 함
+validate(newProd).then((errors) => {
+  if (errors.length > 0) {
+    console.log("VALIDATION ERRORS!");
+    console.log(errors);
+  } else {
+    console.log(newProd.getInformation());
+  }
+});
 
 // products는 단순 json 데이터임. 인스턴스가 아님.
 // 원래 이 객체를 인스턴스화하려면 우리가 아래와 같은 방식으로 수동으로 해야 함
