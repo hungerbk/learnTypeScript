@@ -15,8 +15,12 @@ const App: React.FC = () => {
     // 여기에 console.log가 있기 때문.
     // NewTodo와 App 컴포넌트 간 상호작용이 이루어지고 있음
     // console.log(text);
-    setTodos([{ id: Math.random().toString(), text: text }]);
+    // setTodos([{ id: Math.random().toString(), text: text }]);
     // 하지만 이 상태에서는 새로운 배열로 값이 변경될 뿐 기존 값에 새로운 값이 추가되지는 않음!
+    // 스트레드 연산자와 todos를 함께 써주면 해결! > 하지만 좋은 방법은 아님..! 이 값이 항상 최신값이라는 것을 확인할 수 없음
+    // 이를 해결하기 위해서는 바뀐 값을 상수 업데이트 함수에 전달해야 함
+    // setTodos([ ...todos, { id: Math.random().toString(), text: text }]);
+    setTodos((prevTodos) => [...prevTodos, { id: Math.random().toString(), text: text }]);
   };
 
   return (
