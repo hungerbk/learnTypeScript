@@ -8,7 +8,7 @@ const NewTodo: React.FC = () => {
 
   const todoSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    // 타입스크립트에서는 ref가 연결이 되었는지 확싱할 수 없기 때문에 에러 발생 > ! 넣어줌
+    // 타입스크립트에서는 ref가 연결이 되었는지 확싱할 수 없기 때문에 에러 발생 > !나 ? 넣어줌
     // 렌더링 이후에 서브밋되었을 때만 이 함수가 실행되는 것이기 때문에 null이 아니라는 것을 확신할 수 있음
     const enteredText = textInputRef.current!.value;
     console.log(enteredText);
