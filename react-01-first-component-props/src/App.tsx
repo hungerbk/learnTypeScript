@@ -1,7 +1,7 @@
 import React from "react";
 
 import TodoList from "./components/TodoList";
-import NewTodo from "./components/NewToDo";
+import NewTodo from "./components/NewTodo";
 
 // 리액트에서 제공하는 파일임
 // FC: functional component
