@@ -1,8 +1,12 @@
 import Express, { Request, Response, NextFunction } from "express";
+import { json } from "body-parser";
 
 import todoRoutes from "./routes/todos";
 
 const app = Express();
+
+// 본문 parsing하기
+app.use(json());
 
 app.use("/todos", todoRoutes);
 
